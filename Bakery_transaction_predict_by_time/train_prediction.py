@@ -10,6 +10,9 @@ b = tf.Variable(tf.random_normal([1],dtype=np.float32),name="bias")
 x_data = xy[:,1:3]
 y_data = xy[:,3:4]
 
+##y_std = np.array([(y_data[:,0] - y_data[:,0].mean())/y_data[:,0].std()]).T
+##전처리
+
 X = tf.placeholder(tf.float32, shape=[None,2])
 Y = tf.placeholder(tf.float32, shape=[None,1])
 
@@ -17,7 +20,7 @@ H = tf.matmul(X,W)+b
 
 cost = tf.reduce_mean(tf.square(H-Y))
 
-optimizer = tf.train.AdamOptimizer(learning_rate=0.005)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0005)
 train = optimizer.minimize(cost)
 
 sess = tf.Session()
