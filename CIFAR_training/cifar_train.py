@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.datasets.cifar10 import load_data
+import matplotlib.pyplot as plt
 
 
 (x_train, y_train), (x_test, y_test) = load_data()
@@ -119,21 +120,19 @@ fl_l = fully_connected_layers(full_num,conv_output,size)
 hypothesis = fl_l.forward()
 cost = fl_l.cost_func(Y)
 accuracy = fl_l.accuracy_func(Y)
-optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
 
 
 with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    t1,t2 =sess.run([X,Y],feed_dict = {X:x_train,Y:y_train,keep_prob:0.5})
+    sess.run(tf.global_variables_initializer()
 
     for i in range(1001):
         optimizer_ = sess.run([optimizer],feed_dict = {
                 X:x_train,Y:y_train,keep_prob:0.5})
         cost_,acc_ = sess.run([cost,accuracy],feed_dict = {
                 X:x_train,Y:y_train,keep_prob:1})
-        if i %100==0:
+        if i %3==0:
             print(i+1,'th acc:',acc_,', cost:',cost_)
 
-    
     
 
