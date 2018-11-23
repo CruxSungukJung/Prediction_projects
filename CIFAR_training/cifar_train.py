@@ -1,12 +1,13 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.datasets.cifar10 import load_data
-import matplotlib.pyplot as plt
-
-
+ 
+ 
 (x_train, y_train), (x_test, y_test) = load_data()
-
-
+ 
+y_tf_train = tf.squeeze(tf.one_hot(y_train,10),axis=1)
+ 
+ 
 class Cnn_conv:
     filter_arr= [] 
     last_layer =None
@@ -82,8 +83,8 @@ class fully_connected_layers:
                 pre_size = 250
                 self.conv_bias_arr.append(tf.Variable(tf.zeros([pre_size])))
             elif i == num_of_layers-1:
-                self.conv_weight_arr.append(tf.Variable(initializer([pre_size,1])))
-                self.conv_bias_arr.append(tf.Variable(tf.zeros([1])))
+                self.conv_weight_arr.append(tf.Variable(initializer([pre_size,10])))
+                self.conv_bias_arr.append(tf.Variable(tf.zeros([10])))
             else:
                 self.conv_weight_arr.append(tf.Variable(initializer([pre_size,100])))
                 pre_size = 100
@@ -108,31 +109,29 @@ class fully_connected_layers:
         return acc
     
 X = tf.placeholder(dtype=tf.float32,shape=[None,32,32,3])
-
-Y = tf.placeholder(dtype=tf.float32,shape=[None,1])
+ 
+Y = tf.placeholder(dtype=tf.float32,shape=[None,10])
 keep_prob = tf.placeholder(tf.float32)
 conv_num = int(input('the number of convoulutional layers :'))
 full_num = int(input('the number of fully connected layers :'))
 cnn =  Cnn_conv(X,conv_num)
 conv_output,size = cnn.return_conv_output()
 fl_l = fully_connected_layers(full_num,conv_output,size)
-
+ 
 hypothesis = fl_l.forward()
 cost = fl_l.cost_func(Y)
 accuracy = fl_l.accuracy_func(Y)
-optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
-
-
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
+ 
+ 
 with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer()
-
+    sess.run(tf.global_variables_initializer())
+    t1,t2 =sess.run([X,Y],feed_dict = {X:x_train,Y:y_tf_train.eval(),keep_prob:0.5})
+ 
     for i in range(1001):
         optimizer_ = sess.run([optimizer],feed_dict = {
-                X:x_train,Y:y_train,keep_prob:0.5})
+                X:x_train,Y:y_tf_train.eval(),keep_prob:0.5})
         cost_,acc_ = sess.run([cost,accuracy],feed_dict = {
-                X:x_train,Y:y_train,keep_prob:1})
+                X:x_train,Y:y_tf_train.eval(),keep_prob:1})
         if i %3==0:
             print(i+1,'th acc:',acc_,', cost:',cost_)
-
-    
-
