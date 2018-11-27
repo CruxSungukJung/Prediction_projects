@@ -24,3 +24,4 @@ dnn.fit(x=x_data,y=y_data,steps=NUM_STEP,batch_size=MINI_BATCH)
 
 test_acc = dnn.evaluate(x=x_test,y=y_test,steps=1)["accuracy"]
 print('{}'.format(test_acc))
+
