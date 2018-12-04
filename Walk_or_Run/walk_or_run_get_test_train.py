@@ -64,7 +64,7 @@ for string in test_list:
     
 test_label = test_run_len*[run_label]+test_walk_len*[walk_lable]
 test_indices = range(141)
-test_indices =np.random.choice(test_indices,10)
+test_indices =np.random.choice(test_indices,200)
 test_img = [test_img[i] for i in test_indices]
 train_labels = one_hot(train_labels)
 train_img,train_labels = shuffle_data(train_img,train_labels)

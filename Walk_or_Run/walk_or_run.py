@@ -26,29 +26,18 @@ with tf.Session() as sess:
 
 def CNN_():
     CNN = input_data(shape=[None, 224, 224, 4], name='input_x')
-    CNN = conv_2d(CNN,128,4,activation='relu', regularizer="L2")
+    CNN = conv_2d(CNN,32,4,activation='relu', regularizer="L2")
     CNN = max_pool_2d(CNN,2)
-    CNN = dropout(CNN,keep_prob=0.7)
+    CNN = dropout(CNN,keep_prob=0.5)
     CNN = local_response_normalization(CNN)
     
     #layer 1 size:56
-    CNN = conv_2d(CNN,97,11,activation='relu', regularizer="L2")
+    CNN = conv_2d(CNN,5,3,activation='relu', regularizer="L2")
     CNN = max_pool_2d(CNN,2)
     CNN = dropout(CNN,keep_prob=0.5)
     CNN = local_response_normalization(CNN)
     ###layer 2 size 56
-        #layer 1 size:56
-    CNN = conv_2d(CNN,97,4,activation='relu', regularizer="L2")
-    CNN = max_pool_2d(CNN,2)
-    CNN = dropout(CNN,keep_prob=0.5)
-    CNN = local_response_normalization(CNN)
-    
-    
-    CNN = conv_2d(CNN,30,2,activation='relu', regularizer="L2")
-    CNN = max_pool_2d(CNN,2)
-    CNN = dropout(CNN,keep_prob=0.5)
-    CNN = local_response_normalization(CNN)
-    
+        #layer 1 size:56    
     
     CNN = conv_2d(CNN,5,2,activation='relu', regularizer="L2")
     CNN = max_pool_2d(CNN,2)
@@ -57,8 +46,8 @@ def CNN_():
     return CNN
 
 fc_layer = fully_connected(CNN_(),2,activation='softmax')
-output = regression(fc_layer,optimizer='adam',learning_rate=0.0007,loss='categorical_crossentropy',name='targets')
+output = regression(fc_layer,optimizer='adam',learning_rate=0.01,loss='categorical_crossentropy',name='targets')
 
 model = tflearn.DNN(output,tensorboard_verbose=0,tensorboard_dir = './walk_run',checkpoint_path = './walk_run/checkpoint')
-model.fit({'input_x':X},{'targets':Y},n_epoch=15,validation_set=({'input_x':X_test},{'targets':Y_test}))
+model.fit({'input_x':X},{'targets':Y},show_metric=True,n_epoch=50,validation_set=({'input_x':X_test},{'targets':Y_test}),batch_size=600)
 model.evaluate({'input_x':X_test},{'targets':Y_test})
