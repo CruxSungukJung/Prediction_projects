@@ -46,7 +46,7 @@ def CNN_():
     return CNN
 
 fc_layer = fully_connected(CNN_(),2,activation='softmax')
-output = regression(fc_layer,optimizer='adam',learning_rate=0.01,loss='categorical_crossentropy',name='targets')
+output = regression(fc_layer,optimizer='adam',learning_rate=0.00000089,loss='categorical_crossentropy',name='targets')
 
 model = tflearn.DNN(output,tensorboard_verbose=0,tensorboard_dir = './walk_run',checkpoint_path = './walk_run/checkpoint')
 model.fit({'input_x':X},{'targets':Y},show_metric=True,n_epoch=50,validation_set=({'input_x':X_test},{'targets':Y_test}),batch_size=600)
