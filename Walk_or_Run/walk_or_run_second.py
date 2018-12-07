@@ -7,8 +7,8 @@ import glob
 from IPython.display import Image
 import tflearn     
 import cv2
-from tflearn.layers.conv import *
-from tflearn.layers.core import *
+from tflearn.layers.core import input_data, dropout, fully_connected
+from tflearn.layers.conv import conv_2d, avg_pool_2d
 from tflearn.layers.estimator import regression
 
 
@@ -47,7 +47,8 @@ test =test['label'].values.tolist()
 test_img = [cv2.imread(data) for data in test]
 test_img = np.asarray(test_img,dtype=np.int64)
 
-CNN = input_data([None, 224, 224, 3], name='input_x')
+CNN = input_data(shape=[None, 224, 224, 3],name="input_x")
+
 
 CNN = conv_2d(CNN,32,7,activation='relu', regularizer="L2")
 CNN = avg_pool_2d(CNN,2)
@@ -64,7 +65,7 @@ fl = fully_connected(CNN,1,activation='softmax')
 output  = regression(fl,learning_rate=0.0005,loss='binary_crossentropy',name='targets')
 
 model = tflearn.DNN(output,tensorboard_verbose=0,tensorboard_dir = './walk_run',checkpoint_path = './walk_run/checkpoint')
-model.fit({'input_x':train_img},{'targets':train_label},show_metric=True,n_epoch=5,batch_size=600)
+model.fit({'input_x':train_img},{'targets':train_label},show_metric=True,n_epoch=20,batch_size=600)
 model.evaluate({'input_x':test_img},{'targets':test_label})
 
 

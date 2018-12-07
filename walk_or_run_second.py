@@ -14,6 +14,7 @@ from tflearn.layers.estimator import regression
 
 
 PATH =  "Walk_or_Run"
+save_dir = os.path.join(PATH,"tensorlog")
 train_run = os.path.join(PATH,'train','run')
 train_run = glob.glob(os.path.join(train_run,"*.png"))
 
@@ -46,27 +47,36 @@ test =test['label'].values.tolist()
 
 test_img = [cv2.imread(data) for data in test]
 test_img = np.asarray(test_img,dtype=np.int64)
-
-CNN = input_data([None, 224, 224, 3], name='input_x')
-
-CNN = conv_2d(CNN,32,7,activation='relu', regularizer="L2")
-CNN = avg_pool_2d(CNN,2)
-CNN = dropout(CNN,keep_prob=0.5)
-
-CNN = conv_2d(CNN,45,5,activation='relu', regularizer="L2")
-CNN = avg_pool_2d(CNN,2)
-CNN = dropout(CNN,keep_prob=0.5)
-
-CNN = conv_2d(CNN,10,2,activation='relu',regularizer='L2')
-CNN = avg_pool_2d(CNN,2)
-
-fl = fully_connected(CNN,1,activation='softmax')
+with tf.name_scope('CNN_train'):
+    CNN = input_data([None, 224, 224, 3], name='input_x')
+    
+    CNN = conv_2d(CNN,32,7,activation='relu', regularizer="L2")
+    CNN = avg_pool_2d(CNN,2)
+    CNN = dropout(CNN,keep_prob=0.5)
+    
+    CNN = conv_2d(CNN,45,5,activation='relu', regularizer="L2")
+    CNN = avg_pool_2d(CNN,2)
+    CNN = dropout(CNN,keep_prob=0.5)
+    
+    CNN = conv_2d(CNN,10,2,activation='relu',regularizer='L2')
+    CNN = avg_pool_2d(CNN,2)
+    CNN = dropout(CNN,keep_prob=0.5)
+    tf.summary.scalar("CNN_train", CNN_train)
+    
+with tf.name_scope('fully_connected'):
+    fl = fully_connected(CNN,1,activation='softmax')
+    tf.summary.scalar("fully_connected", fully_connected)
+    summ = tf.summary.merge_all()
 output  = regression(fl,learning_rate=0.0005,loss='binary_crossentropy',name='targets')
 
 model = tflearn.DNN(output,tensorboard_verbose=0,tensorboard_dir = './walk_run',checkpoint_path = './walk_run/checkpoint')
 model.fit({'input_x':train_img},{'targets':train_label},show_metric=True,n_epoch=5,batch_size=600)
 model.evaluate({'input_x':test_img},{'targets':test_label})
 
+sess =tf.Session()
+sess.run(tf.global_variables_initializer())
+writer = tf.summary.FileWriter(save_dir)
+writer.add_graph(sess.graph)
 
 
  
